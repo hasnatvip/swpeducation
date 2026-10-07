@@ -7,14 +7,14 @@ LOCALES : Locales =\
 		'help':
 		{
 			'model': 'choose the model responsible for swapping the face',
-			'pixel_boost': 'choose the pixel boost resolution for the face swapper',
+			'pixel_boost': 'choose the pixel boost resolution for the education swapper',
 			'weight': 'specify the degree of weight applied to the face'
 		},
 		'uis':
 		{
-			'model_dropdown': 'FACE SWAPPER MODEL',
-			'pixel_boost_dropdown': 'FACE SWAPPER PIXEL BOOST',
-			'weight_slider': 'FACE SWAPPER WEIGHT'
+			'model_dropdown': 'EDUCATION SWAPPER MODEL',
+			'pixel_boost_dropdown': 'EDUCATION SWAPPER PIXEL BOOST',
+			'weight_slider': 'EDUCATION SWAPPER WEIGHT'
 		}
 	}
 }
