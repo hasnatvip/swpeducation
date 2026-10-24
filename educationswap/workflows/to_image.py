@@ -9,8 +9,6 @@ from educationswap.workflows.core import conditional_get_target_vision_frames, i
 
 
 def analyse_image() -> ErrorCode:
-	if content_analyser.analyse_image(state_manager.get_item('target_path')):
-		return 3
 	return 0
 
 

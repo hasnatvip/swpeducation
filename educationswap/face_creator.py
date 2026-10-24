@@ -13,6 +13,15 @@ from educationswap.types import BoundingBox, Face, FaceLandmark5, FaceLandmarkSe
 from educationswap.vision import is_vision_frame
 
 
+def has_face_classification() -> bool:
+	return bool(
+		state_manager.get_item('face_selector_gender')
+		or state_manager.get_item('face_selector_race')
+		or state_manager.get_item('face_selector_age_start')
+		or state_manager.get_item('face_selector_age_end')
+	)
+
+
 def create_faces(vision_frame : VisionFrame, bounding_boxes : List[BoundingBox], face_scores : List[Score], face_landmarks_5 : List[FaceLandmark5]) -> List[Face]:
 	faces = []
 	nms_threshold = get_nms_threshold(state_manager.get_item('face_detector_model'), state_manager.get_item('face_detector_angles'))
@@ -46,7 +55,9 @@ def create_faces(vision_frame : VisionFrame, bounding_boxes : List[BoundingBox],
 			'landmarker': face_landmark_score_68
 		}
 		face_embedding, face_embedding_norm = calculate_face_embedding(vision_frame, face_landmark_set.get('5/68'))
-		gender, age, race = classify_face(vision_frame, face_landmark_set.get('5/68'))
+		gender, age, race = None, None, None
+		if has_face_classification():
+			gender, age, race = classify_face(vision_frame, face_landmark_set.get('5/68'))
 
 		faces.append(Face(
 			origin = 'detect',

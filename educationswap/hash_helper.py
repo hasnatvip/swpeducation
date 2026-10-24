@@ -1,5 +1,6 @@
 import os
 import zlib
+from functools import lru_cache
 from typing import Optional
 
 from educationswap.filesystem import get_file_name, is_file
@@ -9,6 +10,7 @@ def create_hash(content : bytes) -> str:
 	return format(zlib.crc32(content), '08x')
 
 
+@lru_cache(maxsize = 128)
 def validate_hash(validate_path : str) -> bool:
 	hash_path = get_hash_path(validate_path)
 
