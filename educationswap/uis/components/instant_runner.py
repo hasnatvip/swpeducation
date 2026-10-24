@@ -49,13 +49,20 @@ def render() -> None:
 def listen() -> None:
 	output_image = get_ui_component('output_image')
 	output_video = get_ui_component('output_video')
+	output_file = get_ui_component('output_file')
 	ui_workflow_dropdown = get_ui_component('ui_workflow_dropdown')
 
 	if output_image and output_video:
+		outputs_runner = [ INSTANT_RUNNER_START_BUTTON, INSTANT_RUNNER_STOP_BUTTON, output_image, output_video ]
+		outputs_clear = [ output_image, output_video ]
+		if output_file:
+			outputs_runner.append(output_file)
+			outputs_clear.append(output_file)
+
 		INSTANT_RUNNER_START_BUTTON.click(start, outputs = [ INSTANT_RUNNER_START_BUTTON, INSTANT_RUNNER_STOP_BUTTON ])
-		INSTANT_RUNNER_START_BUTTON.click(run, outputs = [ INSTANT_RUNNER_START_BUTTON, INSTANT_RUNNER_STOP_BUTTON, output_image, output_video ])
-		INSTANT_RUNNER_STOP_BUTTON.click(stop, outputs = [ INSTANT_RUNNER_START_BUTTON, INSTANT_RUNNER_STOP_BUTTON, output_image, output_video ])
-		INSTANT_RUNNER_CLEAR_BUTTON.click(clear, outputs = [ output_image, output_video ])
+		INSTANT_RUNNER_START_BUTTON.click(run, outputs = outputs_runner)
+		INSTANT_RUNNER_STOP_BUTTON.click(stop, outputs = outputs_runner)
+		INSTANT_RUNNER_CLEAR_BUTTON.click(clear, outputs = outputs_clear)
 	if ui_workflow_dropdown:
 		ui_workflow_dropdown.change(remote_update, inputs = ui_workflow_dropdown, outputs = INSTANT_RUNNER_WRAPPER)
 
@@ -72,7 +79,7 @@ def start() -> Tuple[gradio.Button, gradio.Button]:
 	return gradio.Button(visible = False), gradio.Button(visible = True)
 
 
-def run() -> Tuple[gradio.Button, gradio.Button, gradio.Image, gradio.Video]:
+def run() -> Tuple[gradio.Button, gradio.Button, gradio.Image, gradio.Video, gradio.File]:
 	step_args = collect_step_args()
 	output_path = step_args.get('output_path')
 
@@ -82,10 +89,10 @@ def run() -> Tuple[gradio.Button, gradio.Button, gradio.Image, gradio.Video]:
 		create_and_run_job(step_args)
 		state_manager.set_item('output_path', output_path)
 	if is_image(step_args.get('output_path')):
-		return gradio.Button(visible = True), gradio.Button(visible = False), gradio.Image(value = step_args.get('output_path'), visible = True), gradio.Video(value = None, visible = False)
+		return gradio.Button(visible = True), gradio.Button(visible = False), gradio.Image(value = step_args.get('output_path'), visible = True), gradio.Video(value = None, visible = False), gradio.File(value = step_args.get('output_path'), visible = True)
 	if is_video(step_args.get('output_path')):
-		return gradio.Button(visible = True), gradio.Button(visible = False), gradio.Image(value = None, visible = False), gradio.Video(value = step_args.get('output_path'), visible = True)
-	return gradio.Button(visible = True), gradio.Button(visible = False), gradio.Image(value = None), gradio.Video(value = None)
+		return gradio.Button(visible = True), gradio.Button(visible = False), gradio.Image(value = None, visible = False), gradio.Video(value = step_args.get('output_path'), visible = True), gradio.File(value = step_args.get('output_path'), visible = True)
+	return gradio.Button(visible = True), gradio.Button(visible = False), gradio.Image(value = None), gradio.Video(value = None), gradio.File(value = None, visible = False)
 
 
 def create_and_run_job(step_args : Args) -> bool:
@@ -97,14 +104,14 @@ def create_and_run_job(step_args : Args) -> bool:
 	return job_manager.create_job(job_id) and job_manager.add_step(job_id, step_args) and job_manager.submit_job(job_id) and job_runner.run_job(job_id, process_step)
 
 
-def stop() -> Tuple[gradio.Button, gradio.Button, gradio.Image, gradio.Video]:
+def stop() -> Tuple[gradio.Button, gradio.Button, gradio.Image, gradio.Video, gradio.File]:
 	process_manager.stop()
-	return gradio.Button(visible = True), gradio.Button(visible = False), gradio.Image(value = None), gradio.Video(value = None)
+	return gradio.Button(visible = True), gradio.Button(visible = False), gradio.Image(value = None), gradio.Video(value = None), gradio.File(value = None, visible = False)
 
 
-def clear() -> Tuple[gradio.Image, gradio.Video]:
+def clear() -> Tuple[gradio.Image, gradio.Video, gradio.File]:
 	while process_manager.is_processing():
 		sleep(0.5)
 	if state_manager.get_item('target_path'):
 		clear_temp_directory(state_manager.get_item('target_path'))
-	return gradio.Image(value = None), gradio.Video(value = None)
+	return gradio.Image(value = None), gradio.Video(value = None), gradio.File(value = None, visible = False)

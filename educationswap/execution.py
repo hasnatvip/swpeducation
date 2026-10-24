@@ -49,7 +49,9 @@ def create_inference_providers(execution_device_id : int, execution_providers : 
 			inference_providers.append((educationswap.choices.execution_provider_set.get(execution_provider),
 			{
 				'device_id': execution_device_id,
-				'cudnn_conv_algo_search': resolve_cudnn_conv_algo_search()
+				'cudnn_conv_algo_search': resolve_cudnn_conv_algo_search(),
+				'arena_extend_strategy': 'kNextPowerOfTwo',
+				'do_copy_in_default_stream': True
 			}))
 
 		if execution_provider == 'tensorrt':

@@ -237,6 +237,7 @@ LOCALES : Locales =\
 			'output_audio_encoder_dropdown': 'OUTPUT AUDIO ENCODER',
 			'output_audio_quality_slider': 'OUTPUT AUDIO QUALITY',
 			'output_audio_volume_slider': 'OUTPUT AUDIO VOLUME',
+			'output_file': 'DOWNLOAD RESULT',
 			'output_image_or_video': 'OUTPUT',
 			'output_image_quality_slider': 'OUTPUT IMAGE QUALITY',
 			'output_image_scale_slider': 'OUTPUT IMAGE SCALE',

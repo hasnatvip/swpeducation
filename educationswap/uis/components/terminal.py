@@ -59,6 +59,7 @@ def tqdm_update(self : tqdm, n : int = 1) -> None:
 		if lines and lines[-1].startswith(self.desc):
 			position = log_buffer.rfind(lines[-1])
 			LOG_BUFFER.seek(position)
+			LOG_BUFFER.truncate()
 		else:
 			LOG_BUFFER.seek(0, os.SEEK_END)
 		LOG_BUFFER.write(output + os.linesep)

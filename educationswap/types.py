@@ -1,7 +1,12 @@
 import subprocess
 from collections import namedtuple
 from threading import Lock
-from typing import Any, Callable, Dict, List, Literal, NotRequired, Optional, Tuple, TypeAlias, TypedDict
+from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, TypeAlias, TypedDict
+
+try:
+	from typing import NotRequired
+except ImportError:
+	from typing_extensions import NotRequired
 
 import cv2
 import numpy

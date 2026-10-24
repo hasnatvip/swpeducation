@@ -73,6 +73,7 @@ ComponentName = Literal\
 	'job_list_job_status_checkbox_group',
 	'lip_syncer_model_dropdown',
 	'lip_syncer_weight_slider',
+	'output_file',
 	'output_image',
 	'output_video',
 	'output_video_fps_slider',
