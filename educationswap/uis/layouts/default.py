@@ -1,3 +1,4 @@
+import os
 import gradio
 
 from educationswap import state_manager
@@ -125,4 +126,5 @@ def listen() -> None:
 
 
 def run(ui : gradio.Blocks) -> None:
-	ui.launch(favicon_path = 'educationswap.ico', inbrowser = state_manager.get_item('open_browser'))
+	share = os.environ.get('GRADIO_SHARE', '').lower() in [ 'true', '1' ]
+	ui.launch(favicon_path = 'educationswap.ico', inbrowser = state_manager.get_item('open_browser'), share = share)

@@ -6,7 +6,10 @@ from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, TypeAlia
 try:
 	from typing import NotRequired
 except ImportError:
-	from typing_extensions import NotRequired
+	try:
+		from typing_extensions import NotRequired
+	except ImportError:
+		NotRequired = Any
 
 import cv2
 import numpy

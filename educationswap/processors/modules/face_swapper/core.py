@@ -17,7 +17,7 @@ from educationswap.face_creator import average_face_identity, get_one_face, get_
 from educationswap.face_helper import paste_back, warp_face_by_face_landmark_5
 from educationswap.face_masker import create_area_mask, create_box_mask, create_occlusion_mask, create_region_mask
 from educationswap.face_selector import select_faces, sort_faces_by_order
-from educationswap.filesystem import filter_image_paths, has_image, in_directory, is_image, is_video, resolve_relative_path, same_file_extension
+from educationswap.filesystem import create_directory, filter_image_paths, has_image, in_directory, is_image, is_video, resolve_relative_path, same_file_extension
 from educationswap.model_helper import get_static_model_initializer
 from educationswap.processors.modules.face_swapper import choices as face_swapper_choices
 from educationswap.processors.modules.face_swapper.types import FaceSwapperInputs
@@ -603,13 +603,23 @@ def pre_process(mode : ProcessMode) -> bool:
 		logger.error(translator.get('choose_image_or_video_target') + translator.get('exclamation_mark'), __name__)
 		return False
 
-	if mode == 'output' and not in_directory(state_manager.get_item('output_path')):
-		logger.error(translator.get('specify_image_or_video_output') + translator.get('exclamation_mark'), __name__)
-		return False
+	if mode == 'output':
+		output_path = state_manager.get_item('output_path')
+		if output_path:
+			create_directory(os.path.dirname(output_path))
 
-	if mode == 'output' and not same_file_extension(state_manager.get_item('target_path'), state_manager.get_item('output_path')):
-		logger.error(translator.get('match_target_and_output_extension') + translator.get('exclamation_mark'), __name__)
-		return False
+		if not in_directory(state_manager.get_item('output_path')):
+			logger.error(translator.get('specify_image_or_video_output') + translator.get('exclamation_mark'), __name__)
+			return False
+
+		target_is_video = is_video(state_manager.get_item('target_path'))
+		target_is_image = is_image(state_manager.get_item('target_path'))
+		output_is_video = is_video(state_manager.get_item('output_path'))
+		output_is_image = is_image(state_manager.get_item('output_path'))
+
+		if (target_is_video and not output_is_video) or (target_is_image and not output_is_image):
+			logger.error(translator.get('match_target_and_output_extension') + translator.get('exclamation_mark'), __name__)
+			return False
 
 	return True
 
