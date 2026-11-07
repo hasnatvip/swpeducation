@@ -6,6 +6,7 @@ cd "$PROJECT_DIR" || exit 1
 
 echo "=========================================================="
 echo "⚡ Starting EducationSwap on Local Mac (Apple Silicon CoreML)"
+echo "   Engine: Metal GPU + Neural Engine | Pipeline: In-Memory"
 echo "=========================================================="
 
 # Select Python runtime (prefer Python 3.10 environment where dependencies are installed)
@@ -20,16 +21,26 @@ else
     exit 1
 fi
 
-# Set OpenMP and CoreML optimization environment variables
+# Apple Silicon hardware performance optimizations
 export OMP_NUM_THREADS=4
 export VECLIB_MAXIMUM_THREADS=4
+export PYTORCH_ENABLE_MPS_FALLBACK=1
 
-# Run with Apple Neural Engine/CoreML acceleration, multi-threading, and tolerant memory
+# Launch with super fast Apple Silicon configuration:
+# - CoreML (Metal GPU + ANE) + CPU acceleration
+# - Memory-based workflow (zero SSD thrashing)
+# - Hardware VideoToolbox encoding (h264_videotoolbox)
+# - Face detector single angle 0 (4x detection speedup)
+# - HyperSwap 1a (native FP16 CoreML acceleration)
+# - CodeFormer face enhancement at 70% blend
 "$PYTHON_BIN" educationswap.py run \
     --execution-providers coreml cpu \
     --execution-thread-count 4 \
+    --workflow-strategy memory \
     --video-memory-strategy tolerant \
     --temp-frame-format jpeg \
+    --face-detector-angles 0 \
+    --output-video-encoder h264_videotoolbox \
     --processors face_swapper face_enhancer \
     --face-swapper-model hyperswap_1a_256 \
     --face-enhancer-model codeformer \

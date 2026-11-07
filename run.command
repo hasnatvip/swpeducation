@@ -16,14 +16,20 @@ else
     exit 1
 fi
 
+# Apple Silicon hardware performance optimizations
 export OMP_NUM_THREADS=4
 export VECLIB_MAXIMUM_THREADS=4
+export PYTORCH_ENABLE_MPS_FALLBACK=1
 
+# Run with super fast Apple Silicon configuration
 "$PYTHON_BIN" educationswap.py run \
     --execution-providers coreml cpu \
     --execution-thread-count 4 \
+    --workflow-strategy memory \
     --video-memory-strategy tolerant \
     --temp-frame-format jpeg \
+    --face-detector-angles 0 \
+    --output-video-encoder h264_videotoolbox \
     --processors face_swapper face_enhancer \
     --face-swapper-model hyperswap_1a_256 \
     --face-enhancer-model codeformer \

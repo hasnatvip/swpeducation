@@ -535,9 +535,8 @@ def clear_inference_pool() -> None:
 
 def adjust_inference_providers() -> List[InferenceProvider]:
 	model_precision = get_model_options().get('precision')
-	workflow_mode = state_manager.get_item('workflow_mode')
 
-	if is_macos() and has_execution_provider('coreml') and model_precision == 'fp16' and workflow_mode == 'image-to-video':
+	if is_macos() and has_execution_provider('coreml') and model_precision == 'fp16':
 		return\
 		[
 			(educationswap.choices.execution_provider_set.get('coreml'),
