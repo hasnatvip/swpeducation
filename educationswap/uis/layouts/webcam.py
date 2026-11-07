@@ -73,4 +73,5 @@ def listen() -> None:
 
 def run(ui : gradio.Blocks) -> None:
 	share = os.environ.get('GRADIO_SHARE', '').lower() in [ 'true', '1' ]
-	ui.launch(favicon_path = 'educationswap.ico', inbrowser = state_manager.get_item('open_browser'), share = share)
+	server_name = os.environ.get('GRADIO_SERVER_NAME', '0.0.0.0')
+	ui.launch(favicon_path = 'educationswap.ico', inbrowser = state_manager.get_item('open_browser'), server_name = server_name, share = share)
