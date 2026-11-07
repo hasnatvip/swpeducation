@@ -1,3 +1,4 @@
+import sys
 from argparse import ArgumentParser, _ArgumentGroup, _SubParsersAction
 from typing import Optional
 
@@ -25,7 +26,9 @@ def validate_actions(program : ArgumentParser) -> bool:
 		if action.default and action.choices:
 			if isinstance(action.default, list):
 				if any(default not in action.choices for default in action.default):
+					sys.stderr.write(f"[EDUCATIONSWAP.CONFIG] Invalid default '{action.default}' for '{action.dest}'. Valid choices: {action.choices}\n")
 					return False
 			elif action.default not in action.choices:
+				sys.stderr.write(f"[EDUCATIONSWAP.CONFIG] Invalid default '{action.default}' for '{action.dest}'. Valid choices: {action.choices}\n")
 				return False
 	return True

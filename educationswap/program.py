@@ -260,7 +260,10 @@ def create_execution_program() -> ArgumentParser:
 	available_execution_providers = get_available_execution_providers()
 	group_execution = program.add_argument_group('execution')
 	group_execution.add_argument('--execution-device-ids', help = translator.get('help.execution_device_ids'), type = int, default = config.get_int_list('execution', 'execution_device_ids', '0'), nargs = '+', metavar = 'EXECUTION_DEVICE_IDS')
-	group_execution.add_argument('--execution-providers', help = translator.get('help.execution_providers').format(choices = ', '.join(available_execution_providers)), default = config.get_str_list('execution', 'execution_providers', get_first(available_execution_providers)), choices = available_execution_providers, nargs = '+', metavar = 'EXECUTION_PROVIDERS')
+	configured_execution_providers = config.get_str_list('execution', 'execution_providers', get_first(available_execution_providers))
+	valid_execution_providers = [ provider for provider in configured_execution_providers if provider in available_execution_providers ]
+	default_execution_providers = valid_execution_providers if valid_execution_providers else [ get_first(available_execution_providers) ]
+	group_execution.add_argument('--execution-providers', help = translator.get('help.execution_providers').format(choices = ', '.join(available_execution_providers)), default = default_execution_providers, choices = available_execution_providers, nargs = '+', metavar = 'EXECUTION_PROVIDERS')
 	group_execution.add_argument('--execution-thread-count', help = translator.get('help.execution_thread_count'), type = int, default = config.get_int_value('execution', 'execution_thread_count', '8'), choices = educationswap.choices.execution_thread_count_range, metavar = create_int_metavar(educationswap.choices.execution_thread_count_range))
 	job_store.register_job_keys([ 'execution_device_ids', 'execution_providers', 'execution_thread_count' ])
 	return program
