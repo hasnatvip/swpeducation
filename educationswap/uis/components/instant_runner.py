@@ -1,3 +1,4 @@
+import os
 from time import sleep
 from typing import Optional, Tuple
 
@@ -6,7 +7,7 @@ import gradio
 from educationswap import process_manager, state_manager, translator
 from educationswap.args import collect_step_args
 from educationswap.core import process_step
-from educationswap.filesystem import is_directory, is_image, is_video
+from educationswap.filesystem import create_directory, is_directory, is_image, is_video
 from educationswap.jobs import job_helper, job_manager, job_runner, job_store
 from educationswap.temp_helper import clear_temp_directory
 from educationswap.types import Args, UiWorkflow
@@ -82,9 +83,11 @@ def start() -> Tuple[gradio.Button, gradio.Button]:
 def run() -> Tuple[gradio.Button, gradio.Button, gradio.Image, gradio.Video, gradio.File]:
 	step_args = collect_step_args()
 	output_path = step_args.get('output_path')
+	target_path = state_manager.get_item('target_path')
 
-	if is_directory(step_args.get('output_path')):
-		step_args['output_path'] = suggest_output_path(step_args.get('output_path'), state_manager.get_item('target_path'))
+	if output_path and (is_directory(output_path) or not os.path.splitext(output_path)[1]):
+		create_directory(output_path)
+		step_args['output_path'] = suggest_output_path(output_path, target_path)
 	if job_manager.init_jobs(state_manager.get_item('jobs_path')):
 		create_and_run_job(step_args)
 		state_manager.set_item('output_path', output_path)

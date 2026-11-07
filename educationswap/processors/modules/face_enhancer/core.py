@@ -15,7 +15,7 @@ from educationswap.face_creator import scale_face
 from educationswap.face_helper import paste_back, warp_face_by_face_landmark_5
 from educationswap.face_masker import create_box_mask, create_occlusion_mask
 from educationswap.face_selector import select_faces
-from educationswap.filesystem import create_directory, in_directory, is_image, is_video, resolve_relative_path, same_file_extension
+from educationswap.filesystem import create_directory, get_file_format, in_directory, is_image, is_video, resolve_relative_path, same_file_extension
 from educationswap.processors.modules.face_enhancer import choices as face_enhancer_choices
 from educationswap.processors.modules.face_enhancer.types import FaceEnhancerInputs, FaceEnhancerWeight
 from educationswap.processors.types import ProcessorOutputs
@@ -328,21 +328,26 @@ def pre_process(mode : ProcessMode) -> bool:
 		return False
 	if mode == 'output':
 		output_path = state_manager.get_item('output_path')
+		target_path = state_manager.get_item('target_path')
+
 		if output_path:
 			create_directory(os.path.dirname(output_path))
 
-		if not in_directory(state_manager.get_item('output_path')):
+		if not in_directory(output_path):
 			logger.error(translator.get('specify_image_or_video_output') + translator.get('exclamation_mark'), __name__)
 			return False
 
-		target_is_video = is_video(state_manager.get_item('target_path'))
-		target_is_image = is_image(state_manager.get_item('target_path'))
-		output_is_video = is_video(state_manager.get_item('output_path'))
-		output_is_image = is_image(state_manager.get_item('output_path'))
+		if not same_file_extension(target_path, output_path):
+			target_format = get_file_format(target_path)
+			output_format = get_file_format(output_path)
+			target_is_video = target_format in educationswap.choices.video_formats
+			output_is_video = output_format in educationswap.choices.video_formats
+			target_is_image = target_format in educationswap.choices.image_formats
+			output_is_image = output_format in educationswap.choices.image_formats
 
-		if (target_is_video and not output_is_video) or (target_is_image and not output_is_image):
-			logger.error(translator.get('match_target_and_output_extension') + translator.get('exclamation_mark'), __name__)
-			return False
+			if not ((target_is_video and output_is_video) or (target_is_image and output_is_image)):
+				logger.error(translator.get('match_target_and_output_extension') + translator.get('exclamation_mark'), __name__)
+				return False
 	return True
 
 

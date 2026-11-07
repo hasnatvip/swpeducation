@@ -1,3 +1,4 @@
+import os
 from typing import List, Optional, Tuple
 
 import gradio
@@ -5,7 +6,7 @@ import gradio
 from educationswap import logger, state_manager, translator
 from educationswap.args import collect_step_args
 from educationswap.common_helper import get_first, get_last
-from educationswap.filesystem import is_directory
+from educationswap.filesystem import create_directory, is_directory
 from educationswap.jobs import job_manager
 from educationswap.types import UiWorkflow
 from educationswap.uis import choices as uis_choices
@@ -86,9 +87,11 @@ def apply(job_action : JobManagerAction, created_job_id : str, selected_job_id :
 	selected_step_index = convert_int_none(selected_step_index)
 	step_args = collect_step_args()
 	output_path = step_args.get('output_path')
+	target_path = state_manager.get_item('target_path')
 
-	if is_directory(step_args.get('output_path')):
-		step_args['output_path'] = suggest_output_path(step_args.get('output_path'), state_manager.get_item('target_path'))
+	if output_path and (is_directory(output_path) or not os.path.splitext(output_path)[1]):
+		create_directory(output_path)
+		step_args['output_path'] = suggest_output_path(output_path, target_path)
 
 	if job_action == 'job-create':
 		if created_job_id and job_manager.create_job(created_job_id):
