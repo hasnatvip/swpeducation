@@ -1,5 +1,6 @@
 import os
 import subprocess
+import time
 from functools import lru_cache
 from typing import List, Optional, Tuple
 from urllib.parse import urlparse
@@ -38,6 +39,7 @@ def conditional_download(download_directory_path : str, urls : List[str]) -> Non
 				progress.set_postfix(download_providers = state_manager.get_item('download_providers'), file_name = download_file_name)
 
 				while current_size < download_size:
+					time.sleep(0.05)
 					if is_file(download_file_path):
 						current_size = get_file_size(download_file_path)
 						progress.update(current_size - progress.n)
